@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="./css/bootstrap.css">
+  <title>捉 星 星！</title>
+  <style>
+    * {
+
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft Yahei';
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: url(./images/bg.svg);
+      cursor: url(./images/net50.png)7 7, auto;
+      overflow: hidden;
+      /* 禁止反白 */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+    }
+
+    body:active {
+      cursor: url(./images/net50-al.png)7 7, auto;
+    }
+
+    #count {
+      height: 9%;
+      font-size: 2.2rem;
+      color: rgb(243, 255, 133);
+    }
+
+    #game-area {
+      height: 82%;
+      position: relative;
+      /* overflow: hidden; */
+    }
+
+    #footer {
+      height: 9%;
+      font-size: 2.2rem;
+      color: rgb(235, 235, 235);
+      filter: drop-shadow(0rem 0rem 0.2rem rgb(255, 255, 100));
+    }
+
+    #rule {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* 輪播文字內容 */
+    .pic-text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      color: white;
+    }
+
+    .pic-text p {
+      font-size: 1.05rem;
+    }
+
+    #go {
+      position: absolute;
+      top: 63.5%;
+      left: 50%;
+      z-index: 11;
+      transform: translateX(-50%);
+      transition: 0.6s;
+    }
+
+    #go:focus {
+      width: 5vmin;
+      height: 5vmin;
+      border-radius: 50%;
+      transform: translateX(-50%) rotate(2520deg) scale(1.3);
+    }
+
+    .star {
+      width: 12vmin;
+      position: absolute;
+    }
+
+    .star:hover {
+      filter: hue-rotate(45deg);
+    }
+
+    .star:active {
+      filter: hue-rotate(300deg);
+    }
+
+    .starN {
+      animation: rotate 0.15s infinite;
+    }
+
+    @keyframes rotate {
+      to {
+        transform: rotate(0deg);
+      }
+
+      from {
+        transform: rotate(60deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TODO 1.遊戲玩法介紹(有左右頁文字無框?輪播圖)OK 2.開始按鈕(動畫發亮) 3.遊戲中JQ(星星跑動、計分、計數) 4.遊戲結束對話(若為第一則輸入名字) -->
+  <!-- *top-計算區 -->
+  <div id="count" class="container-fluid d-flex justify-content-between align-items-center">
+    <!-- *N1 遊戲開始時消失 -->
+    <div id="N1">
+      捉星星達人：<span id="N1-name"></span>
+      <span id="N1-num"></span>
+    </div>
+    <div>
+      GET <b>✰</b>＊
+      <span id="getStar-num" class="text-white">0</span>
+    </div>
+  </div>
+
+  <!-- *星星範圍 -->
+  <div id="game-area" class="container-fluid p-0"></div>
+
+  <!-- *存活星星數(達20遊戲結束) -->
+  <div id="footer" class="container-fluid d-flex justify-content-between align-items-center">
+    <div>
+      ⚝ / <span id="leaveStart-num">0</span>
+    </div>
+  </div>
+
+  <!-- *遊戲規則對話框 -->
+  <div id="rule" class="carousel slide w-75" data-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="./images/trasparent-bg-text.svg" class="d-block w-100">
+        <div class="pic-text">
+          <h4>來捉星星吧🌟</h4>
+          <p>據說：捕捉到星星的人，內心會開始轉變，變得更快樂，更能夠享受這一生，只是捉星星的同時，必須保有純潔的心，若帶著急躁、貪婪的心，將會越來越捉不到...</p>
+        </div>
+
+      </div>
+      <div class="carousel-item">
+        <img src="./images/trasparent-bg-text.svg" class="d-block w-100">
+        <div class="pic-text">
+          <h4>如何捕捉星星💫</h4>
+          <p>星星會從四面八方出現，時間越久會越來越快，請你將你的網子放到星星上點一下，就捕捉到囉！當天空星星存留10顆以上，就會被送回地球。<br>
+            <span style="color: rgb(243, 255, 133);">注意：星星可是會越飛越快的哦，遇到流星趕快抓緊它！</span>
+          </p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="./images/trasparent-bg-text.svg" class="d-block w-100">
+        <div class="pic-text">
+          <h4>捉星星達人🏆</h4>
+          <p>捕捉最多星星的人，將成為 " 捉星星達人 " ，並且能夠獲得上帝的眷屬，上帝看見你的努力，你將在凡事上都富足，且順利，而且上帝賜給你智慧！你可以好好享受這一生。</p>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <img src="./images/trasparent-bg-text.svg" class="d-block w-100">
+        <div class="pic-text">
+          <h4>面板介紹</h4>
+          <p>左下角：天空星星數<br>右上角：捕捉星星數<br><span style="color: rgb(243, 255, 133);">只有捉星星達人才可以出現在捉星星達人上！</span></p>
+        </div>
+      </div>
+    </div>
+    <a class="carousel-control-prev" href="#rule" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#rule" role="button" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+
+  <!-- *開始按鈕 -->
+  <button id="go" type="button" class="btn btn-outline-warning btn-sm">出發</button>
+
+  <script src="./js/jquery-3.5.1.min.js"></script>
+  <script src="./js/popper.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+
+  <!-- * ID結構(JQ會用到的) -->
+  <!--
+    N1-name：最高分的捉星星達人名字
+    leaveStart-num：遊戲中星星存活數(若===20，遊戲結束)
+    getStar-num：當局遊戲中獲得星星數
+    game-area：星星跑動範圍
+    starN：一般星星
+    starQ：流星
+    starID：星星流水號
+  -->
+  <script>
+    // 音效載入
+    const catchMusic = new Audio
+    const bgMusic = new Audio
+    bgMusic.src = './music/drum_rythm.mp3'
+    bgMusic.loop = true
+    // 音效陣列
+    let catchMusicList = ['./music/pianoA.mp3', './music/pianoB.mp3', './music/pianoC.mp3', './music/pianoD.mp3', './music/pianoE.mp3', './music/pianoF.mp3', './music/pianoG.mp3', './music/pianoC2.mp3', './music/small_drum.mp3', './music/bass_drum.mp3']
+
+
+    // 存留星星數
+    let leaveStart = 0
+    // 獲得星星數
+    let getStar = 0
+    // 星星出現
+    let gametimer = 0
+    // 出現速率
+    let occur = 1050
+    // 移動速度
+    let speed = 3100
+    // 星星流水號 (從1開始)
+    let starID = 1
+    // 達人名稱輸入
+    let input = ''
+
+    // 載入達人紀錄 (達人名稱/達人星星數)
+    let N1star = { name: '', num: 0 }
+    let storage = JSON.parse(localStorage.getItem("N1star"))
+    // 如果有分數紀錄(null為沒有紀錄的人)
+    if (storage != null) {
+      // 將星星達人的"名字"載入，並修改網頁文字
+      N1star.name = storage.name
+      $('#N1-name').text(N1star.name)
+      // TODO 將星星達人的"數量"載入，並修改網頁文字
+      N1star.num = storage.num
+      $('#N1-num').text(`(${N1star.num}顆)`)
+    }
+
+
+
+    // 區間隨機亂數
+    const rand = (min, max) => {
+      return Math.round(Math.random() * (max - min) + min)
+    }
+
+    // 星星移動遞迴
+    const moveStar = (starID) => {
+      $(`#star${starID}`).animate({
+        top: rand(0, 100) + "%",
+        left: rand(0, 100) + "%"
+      }, speed, function () {
+        // 進入遞迴
+        moveStar(starID)
+      })
+    }
+
+    // JQ 執行
+    $(function () {
+      // 捉星星開始鍵
+      $('#go').click(function () {
+        // 轉場
+        $('#go').text('🚀')
+        setTimeout(() => {
+          $('#go').css('top', '-55%')
+          $('#rule').css('top', '-55%')
+          $('body').css('filter', 'brightness(3)')
+        }, 600)
+        setTimeout(() => {
+          $('body').css('filter', 'brightness(1)')
+          // 播放背景音樂
+          bgMusic.play()
+        }, 900)
+
+        // 重置面板
+        leaveStart = 0
+        getStar = 0
+        $('#leaveStart-num').text(leaveStart)
+        $('#getStar-num').text(getStar)
+        // 重置速率
+        occur = 1050
+        speed = 3100
+
+        // 星星出現
+        setTimeout(() => {
+          gametimer = setInterval(() => {
+            // 出現速率：每次-0.05s
+            if (occur >= 500) {
+              occur -= 50
+              console.log(`出現速率：${occur}s`);
+            }
+            // 星星速度：每次-0.1s
+            if (speed >= 300) {
+              speed -= 50
+              console.log(`星星跑速：${speed}s`);
+            }
+            // 進行中 10顆星星內都可以捕捉
+            if (leaveStart < 10) {
+              let num1 = rand(1, 100)
+              console.log(`星星機率分布：${num1}`);
+              // 放入 一般星星 / 流星 機率 9.5:0.5----------------
+              if (num1 <= 95) {
+                // 放入一般星星N(+流水號)
+                $('#game-area').append(`<img id="star${starID}" class="starN star" src="./images/starN.svg">`)
+              }
+              else {
+                // 放入流星Q(+流水號)
+                $('#game-area').append(`<img id="star${starID}" class="starQ star" src="./images/starQ.svg">`)
+              }
+              // 存留數+1
+              leaveStart++
+              $('#leaveStart-num').text(leaveStart)
+
+              // 隨機位置出現 各25% 上下左右-----------------------
+              let num2 = rand(1, 100)
+              if (num2 <= 25) {
+                // 左側
+                $(`#star${starID}`).css({ "top": `${rand(0, 100)}%` })
+              }
+              else if (num2 >= 26 && num2 <= 50) {
+                // 右側
+                $(`#star${starID}`).css({ "top": `${rand(0, 100)}%`, "right": "0" })
+              }
+              else if (num2 >= 51 && num2 <= 75) {
+                // 上
+                $(`#star${starID}`).css({ "left": `${rand(0, 100)}%` })
+              }
+              else if (num2 >= 76 && num1 <= 100) {
+                // 下
+                $(`#star${starID}`).css({ "bottom": "0", "left": `${rand(0, 100)}%` })
+              }
+              // 讓該星星進入 移動遞迴
+              moveStar(starID)
+              // 星星流水號
+              starID++
+            }
+            // 結束條件 存留星星10顆以上
+            else {
+              // 音樂停止
+              bgMusic.pause()
+              bgMusic.currentTime = 0
+              // 停止遊戲
+              clearInterval(gametimer)
+              // 清除所有星星
+              $(".star").remove();
+              // 成為達人
+              if (getStar > N1star.num && N1star.num !== 0) {
+                input = prompt(`恭喜你成為新一代 捉星星達人 !\n你捉的星星數 ${getStar} 顆，超過 ${N1star.name} 的 ${N1star.num} 顆，你實在太厲害了💪，恭喜你將蒙神眷顧，將擁有凡事富足、順利、擁有智慧好好享受一生👼。\n請輸入你的名字，讓世人都知道你🙌`)
+              }
+              else if (getStar > N1star.num && N1star.num == 0) {
+                input = prompt(`恭喜你成為第一代 捉星星達人 !\n你捉的星星數 ${getStar} 顆，你實在太厲害了💪，恭喜你將蒙神眷顧，將擁有凡事富足、順利、擁有智慧好好享受一生👼。\n請輸入你的名字，讓世人都知道你🙌`)
+              }
+              else {
+                alert(`哇～你捕捉了 ${getStar} 顆！\n捕捉越多星星越多祝福唷！\n祝福你凡事富足、順利，得到越多星星～😀`)
+              }
+              // 達人名稱輸入及存入 localstorage
+              // 有輸入名字(trim去除前後空白!='')
+              if (input != null && input.trim() != '' && getStar > N1star.num) {
+                // 將輸入的名字與星星數存入變數
+                N1star.name = input
+                N1star.num = getStar
+                // 修改達人網頁文字
+                $('#N1-name').text(N1star.name)
+                $('#N1-num').text(`(${N1star.num}顆)`)
+                // *將達人變數"轉文字"後存入 localStorage
+                localStorage.setItem("N1star", JSON.stringify(N1star));
+              }
+
+              // 回到最初畫面
+              setTimeout(() => {
+                $('body').css('filter', 'brightness(3)')
+              }, 300)
+              setTimeout(() => {
+                $('#go').text('開始')
+                $('#go').css('top', '63.5%')
+                $('#rule').css('top', '50%')
+                $('body').css('filter', 'brightness(1)')
+              }, 600)
+            }
+
+          }, occur)
+        }, 500)
+      })
+
+      // 捕捉(點擊)星星
+      // 捕捉一般星星 !如果是有複層的標籤 需要用到 on('click','選到該標籤')
+      $('#game-area').on('mousedown', '.starN', function () {
+        // 面板控制
+        leaveStart--
+        getStar++
+        $('#leaveStart-num').text(leaveStart)
+        $('#getStar-num').text(getStar)
+        // 整個星星標籤消失
+        $(this).remove()
+      })
+      // 捕捉流星 (所有星星都捕捉起來)
+      $('#game-area').on('mousedown', '.starQ', function () {
+        leaveStart -= $('.star').length
+        getStar += $('.star').length
+        $('#leaveStart-num').text(leaveStart)
+        $('#getStar-num').text(getStar)
+        // 整個星星標籤消失
+        $('.star').remove()
+      })
+      // 捕捉星星"純音效控制"
+      $('#game-area').on('mousedown', '.star', function () {
+        catchMusic.src = catchMusicList[rand(0, 9)]
+        catchMusic.play()
+      })
+
+
+    })
+  </script>
+</body>
+
+</html>
